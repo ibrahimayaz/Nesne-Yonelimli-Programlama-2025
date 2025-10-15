@@ -42,16 +42,16 @@ Bu diyagramda “Araba” ve “Motosiklet”, “Arac”ın özel örnekleridir
 classDiagram
     class Sekil {
       <<abstract>>
-      +Alan(): double
+      +Alan() double
     }
     class Ucgen {
       +taban: double
       +yukseklik: double
-      +Alan(): double
+      +Alan() double
     }
     class Daire {
       +r: double
-      +Alan(): double
+      +Alan() double
     }
     Sekil <|-- Ucgen
     Sekil <|-- Daire
@@ -68,15 +68,15 @@ Burada “Sekil” soyut bir üst sınıf olarak ortak bir sözleşme sağlar. �
 classDiagram
     class IYazdirilabilir {
       <<interface>>
-      +Yazdir(): void
+      +Yazdir() void
     }
     class Fatura {
       +no: string
-      +Yazdir(): void
+      +Yazdir() void
     }
     class Rapor {
       +ad: string
-      +Yazdir(): void
+      +Yazdir() void
     }
     IYazdirilabilir <|.. Fatura
     IYazdirilabilir <|.. Rapor
