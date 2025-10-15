@@ -19,7 +19,7 @@
 classDiagram
     class Arac {
       +hiz: int
-      +Calistir(): void
+      +Calistir() void
     }
     class Araba {
       +kapiSayisi: int
