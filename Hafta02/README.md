@@ -60,10 +60,10 @@ classDiagram
     }
     class SepetKalemi {
       +adet: int
-      +AraToplam(): decimal
+      +AraToplam() decimal
     }
     class Sepet {
-      +Toplam(): decimal
+      +Toplam() decimal
     }
 
     Sepet *-- "*" SepetKalemi : composition
