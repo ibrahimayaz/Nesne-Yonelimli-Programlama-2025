@@ -57,7 +57,7 @@ classDiagram
     class Kisi {
       +ad: string
       +yas: int
-      +SelamVer(): void
+      +SelamVer():void
     }
 ```
 
