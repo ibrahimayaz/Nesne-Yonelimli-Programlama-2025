@@ -57,31 +57,57 @@ classDiagram
 ## 6 Adet Kapsülleme C# Örneği (Optimize)
 Örnek 1 — BankaHesabi: Bakiye Kapsülleme
 ```csharp
-public class BankaHesabi
+namespace Kapsulleme01
 {
-    private decimal _bakiye;
-    public string Iban { get; }
-
-    public BankaHesabi(string iban, decimal baslangic)
+    public class BankaHesabi
     {
-        Iban = string.IsNullOrWhiteSpace(iban) ? throw new ArgumentException("IBAN boş") : iban.Trim();
-        _bakiye = baslangic >= 0 ? baslangic : throw new ArgumentOutOfRangeException(nameof(baslangic));
-    }
+        //-bakiye:decimal
+        private decimal bakiye;
 
-    public void ParaYatir(decimal tutar)
-    {
-        if (tutar <= 0) throw new ArgumentOutOfRangeException(nameof(tutar));
-        _bakiye += tutar;
-    }
+        //+iban:string
+        private string iban;
 
-    public void ParaCek(decimal tutar)
-    {
-        if (tutar <= 0) throw new ArgumentOutOfRangeException(nameof(tutar));
-        if (tutar > _bakiye) throw new InvalidOperationException("Yetersiz bakiye");
-        _bakiye -= tutar;
-    }
+        //+BankaHesabi(iban:string, bakiye:decimal)
+        public BankaHesabi(string iban, decimal bakiye)
+        {
+     
+            this.iban = string.IsNullOrWhiteSpace(iban) ? iban : "Geçersiz IBAN";
+            this.bakiye = (bakiye>=0)? bakiye:0;
 
-    public decimal Bakiye() => _bakiye;
+        }
+
+        public void ParaYatir(decimal tutar)
+        {
+            if (tutar<0)
+            {
+                Console.WriteLine("Lütfen geçerli bir tutar giriniz.");
+            }
+            else
+            {
+                bakiye += tutar;
+            }
+        }
+
+        public void ParaCek(decimal tutar) {
+            if (tutar<0)
+            {
+                Console.WriteLine("Girilen tutar negatif olamaz");
+            }else if (tutar > bakiye)
+            {
+                Console.WriteLine("Yetersiz bakiye !");
+            }
+            else
+            {
+                bakiye -= tutar;
+            }
+        }
+
+        public decimal Bakiye()
+        {
+            return bakiye;
+        }
+
+    }
 }
 ```
 
