@@ -1,0 +1,43 @@
+# .gitignore for Visual Studio / .NET projects
+# See https://github.com/github/gitignore/blob/main/VisualStudio.gitignore for reference
+
+# Build artifacts
+bin/
+obj/
+**/bin/
+**/obj/
+
+# Visual Studio temporary files, cache and generated files
+.vs/
+*.vsix
+*.vsixpkg
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/
+
+# Rider
+.idea/
+
+# NuGet
+*.nupkg
+packages/
+*.snupkg
+
+# Dotnet publish
+publish/
+*.publish/
+
+# Resharper
+_ReSharper*/
+*.DotSettings.user
+
+# Misc
+*.log
+*.vsidx
+.DS_Store

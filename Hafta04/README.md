@@ -11,19 +11,20 @@ Aşağıda önce UML diyagramı, ardından kapsüllemeyi gösteren optimize C# �
 classDiagram
     class BankaHesabi {
       -bakiye: decimal
-      +BankaHesabi(iban: string, baslangic: decimal)
-      +ParaYatir(tutar: decimal): void
-      +ParaCek(tutar: decimal): void
-      +Bakiye(): decimal
+      -iban: string
+      +BankaHesabi(iban: string, bakiye: decimal)
+      +ParaYatir(tutar: decimal) void
+      +ParaCek(tutar: decimal) void
+      +Bakiye() decimal
     }
 
     class Urun {
       -ad: string
       -fiyat: decimal
       +Urun(ad: string, fiyat: decimal)
-      +Ad(): string
-      +Fiyat(): decimal
-      +ZamYap(yuzde: decimal): void
+      +Ad() string
+      +Fiyat() decimal
+      +ZamYap(yuzde: decimal) void
     }
 
     class Email {
