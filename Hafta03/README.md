@@ -35,21 +35,14 @@ classDiagram
       +TamBilgi:string~get~
       +Kullanici(ad:string, soyad:string, dogumTarihi:DateTime)
     }
+ 
+
+    class Person {
+      -name: string
+      -password:string
+      +Password:string~get~
+    }
     
-
-    class SepetKalemi {
-      +UrunId: int
-      +Adet: int
-      +AraToplam(fiyat: decimal) decimal
-    }
-
-    class Sepet {
-      -kalemler: List~SepetKalemi~
-      +Ekle(kalem: SepetKalemi) void
-      +Sil(predicate) int
-      +Kalemler() IReadOnlyCollection~SepetKalemi~
-    }
-    Sepet *-- SepetKalemi
 ```
 
 ## 6 Adet Kapsülleme C# Örneği (Optimize)
@@ -171,44 +164,38 @@ public class Urun
  }
 ```
 
-Örnek 5 — Sepet: Koleksiyon Kapsülleme
+Örnek 4 — Person: Kapsülleme
 ```csharp
-public class SepetKalemi
-{
-    public int UrunId { get; }
-    public int Adet { get; }
-    public SepetKalemi(int urunId, int adet)
-    {
-        if (urunId <= 0) throw new ArgumentOutOfRangeException(nameof(urunId));
-        if (adet <= 0) throw new ArgumentOutOfRangeException(nameof(adet));
-        UrunId = urunId; Adet = adet;
-    }
-    public decimal AraToplam(decimal fiyat) => decimal.Round(fiyat * Adet, 2);
-}
+ public class Person
+ {
+     private string name; // field
+     private string password;
 
-public class Sepet
-{
-    private readonly List<SepetKalemi> _kalemler = new();
-    public void Ekle(SepetKalemi kalem) => _kalemler.Add(kalem ?? throw new ArgumentNullException(nameof(kalem)));
-    public int Sil(Func<SepetKalemi, bool> p) => _kalemler.RemoveAll(k => p(k));
-    public IReadOnlyCollection<SepetKalemi> Kalemler() => _kalemler.AsReadOnly();
-}
-```
+     public string Name   // property
+     {
+         get { return name; }   // get method
+         set
+         {
 
-Örnek 6 — Kisi: Doğrulama + Salt-Okunur Telefonlar
-```csharp
-public class Kisi
-{
-    private string _ad;
-    private readonly List<string> _telefonlar = new();
-    public Kisi(string ad) => _ad = string.IsNullOrWhiteSpace(ad) ? throw new ArgumentException("Ad boş") : ad.Trim();
-    public string Ad() => _ad;
-    public void AdGuncelle(string ad) => _ad = string.IsNullOrWhiteSpace(ad) ? throw new ArgumentException("Ad boş") : ad.Trim();
-    public void TelefonEkle(string tel)
-    {
-        if (string.IsNullOrWhiteSpace(tel)) throw new ArgumentException("Tel boş");
-        _telefonlar.Add(tel.Trim());
-    }
-    public IReadOnlyList<string> Telefonlar() => _telefonlar.AsReadOnly();
-}
+             name = value;// set method
+         }
+     }
+
+     public string Password
+     {
+         get { return password; }
+         set
+         {
+             if (value=="123")
+             {
+                 Console.WriteLine("Tebrikler! Giriş Yaptınız");
+                 password = value;
+             }
+             else
+             {
+                 Console.WriteLine("Şifreniz hatalı");
+             }
+         }
+     }
+ }
 ```
