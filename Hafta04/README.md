@@ -1,205 +1,101 @@
-# 🔒 Hafta04 — Kapsülleme (Encapsulation) — UML + Teori + 6 C# Örneği
+# 🧬 Hafta03 — Kalıtım, Çok Biçimlilik (Teori) ve UML Generalization/Realization
 
-Bu hafta kapsülleme (encapsulation) üzerinde duruyoruz. Kapsülleme; veriyi (durum) ve o veriyi yöneten davranışları (operasyonlar) tek bir sınıfta bir araya getirerek dış dünyaya yalnızca gerekli olan arayüzü sunmayı amaçlar. Böylece sınıfın iç tutarlılığı (invariants) korunur, yan etkiler azaltılır ve değişikliklerin sınıfın dışına sızması engellenir. Doğru kapsülleme, “nesne her an geçerli durumda kalmalıdır” ilkesini benimser: kurucularda ve değiştirici metotlarda doğrulama (guard clauses), tutarlı hata mesajları ve mümkünse değişmez (immutable) değer nesneleri kullanılır. Koleksiyonlar doğrudan dışarı açılmaz; salt-okunur görünümler (IReadOnlyCollection) sunulur ve öğe ekleme/çıkarma kontrollü metotlarla yapılır. Bu yaklaşım test edilebilirliği, bakım kolaylığını ve genişletilebilirliği artırır.
+Üçüncü haftada OOP’nin davranış odaklı temel ilkelerini teorik düzeyde ele alıyoruz. Özellikle “kalıtım” (generalization) ve “çok biçimlilik” (polymorphism) kavramlarının neden ve nasıl kullanılması gerektiğini, arayüz (interface) sözleşmeleriyle birlikte UML üzerinde ifade edeceğiz. Bu haftada da kod ayrıntısına girmeden, kavramsal doğruluğa ve görselleştirmeye odaklanıyoruz.
 
-Kapsüllemeyi uygularken bazı iyi pratikler: (1) Alanları private tutun; dışarıya property veya metotlarla kontrollü erişim verin. (2) Nesnenin tüm geçerlilik kurallarını tek yerde konsolide edin (örneğin Email gibi değer nesneleriyle). (3) Koleksiyon kapsülleme uygulayın; liste referansını dışarı döndürmek yerine salt-okunur görünüm verin ve sınıf içinden ekleyip silin. (4) Küçük, tek sorumluluğa sahip sınıflar tercih edin; sınıfın amacı net olmalı. (5) Durum değişikliklerinde geçersiz durumları erken yakalayın; “fail fast” yaklaşımıyla hata kaynağını çabuk tespit edin.
+## 🎯 Öğrenme Hedefleri
+- 🔺 Kalıtımın (generalization) doğru kullanım alanlarını ve sınırlarını kavramak.
+- 🌀 Çok biçimliliğin (polymorphism) esneklik ve genişletilebilirlik sağlama biçimlerini anlamak.
+- 🔻 Arayüz gerçekleştirme (realization) ilişkisini UML ile doğru ifade edebilmek.
 
-Aşağıda önce UML diyagramı, ardından kapsüllemeyi gösteren optimize C# örnekleri yer alır.
+## 🧬 Kalıtım (Generalization) — Ne Zaman?
+- Paylaşılan özellik ve davranışları üst bir sınıfta toplamak istediğinizde uygundur.
+- “is-a” testi: Alt tür gerçekten üst türün özel bir hali mi? Bu soru dürüstçe “evet”se kalıtım uygundur.
+- Aşırı kalıtım kokuları: Sırf kod paylaşmak için kalıtım kullanmak; uygun değilse bileşim (has-a) tercih edilmelidir.
+- Yararları: Kod tekrarını düşürür, ortak sözleşme sunar.
+- Riskleri: Yanlış hiyerarşi, kırılgan temeller ve zor anlaşılan bağımlılıklar oluşturabilir.
 
-## UML — Temel Kapsülleme Senaryoları
+### 📐 Örnek — Taşıt Hiyerarşisi
 ```mermaid
 classDiagram
-    class BankaHesabi {
-      -bakiye: decimal
-      -iban: string
-      +BankaHesabi(iban: string, bakiye: decimal)
-      +ParaYatir(tutar: decimal) void
-      +ParaCek(tutar: decimal) void
-      +Bakiye() decimal
+    class Arac {
+      +hiz: int
+      +Calistir() void
     }
-
-    class Urun {
-      -ad: string
-      -fiyat: decimal
-      +Urun(ad: string, fiyat: decimal)
-      +Ad() string
-      +Fiyat() decimal
-      +ZamYap(yuzde: decimal) void
+    class Araba {
+      +kapiSayisi: int
     }
-
-    class Email {
-      +Deger: string
-      +Email(deger: string)
+    class Motosiklet {
+      +yanDestekVar: bool
     }
-
-    class Kullanici {
-      -email: Email
-      +Kullanici(email: Email)
-      +Email(): Email
-    }
-    Kullanici *-- Email
-
-    class SepetKalemi {
-      +UrunId: int
-      +Adet: int
-      +AraToplam(fiyat: decimal): decimal
-    }
-
-    class Sepet {
-      -kalemler: List~SepetKalemi~
-      +Ekle(kalem: SepetKalemi): void
-      +Sil(predicate): int
-      +Kalemler(): IReadOnlyCollection~SepetKalemi~
-    }
-    Sepet *-- SepetKalemi
+    Arac <|-- Araba
+    Arac <|-- Motosiklet
 ```
+Bu diyagramda “Araba” ve “Motosiklet”, “Arac”ın özel örnekleridir. Ortak davranış (örn. çalıştırma) üst sınıfta, özgün nitelikler alt sınıflardadır.
 
-## 6 Adet Kapsülleme C# Örneği (Optimize)
-Örnek 1 — BankaHesabi: Bakiye Kapsülleme
-```csharp
-namespace Kapsulleme01
-{
-    public class BankaHesabi
-    {
-        //-bakiye:decimal
-        private decimal bakiye;
+## 🌀 Çok Biçimlilik (Polymorphism) — Neden Gerekli?
+- Aynı işlem çağrısının (örn. “Alan()”) farklı türlerde farklı sonuçlar üretmesine olanak tanır.
+- Yeni varyantlar eklendiğinde mevcut kodu en az etkiyle genişletebilmek için kullanılır.
+- Bağımlılıkların soyutlamalara (üst sınıf/arayüz) bağlanmasını teşvik eder, böylece modüller arası bağımlılık zayıflar.
 
-        //+iban:string
-        private string iban;
-
-        //+BankaHesabi(iban:string, bakiye:decimal)
-        public BankaHesabi(string iban, decimal bakiye)
-        {
-     
-            this.iban = string.IsNullOrWhiteSpace(iban) ? iban : "Geçersiz IBAN";
-            this.bakiye = (bakiye>=0)? bakiye:0;
-
-        }
-
-        public void ParaYatir(decimal tutar)
-        {
-            if (tutar<0)
-            {
-                Console.WriteLine("Lütfen geçerli bir tutar giriniz.");
-            }
-            else
-            {
-                bakiye += tutar;
-            }
-        }
-
-        public void ParaCek(decimal tutar) {
-            if (tutar<0)
-            {
-                Console.WriteLine("Girilen tutar negatif olamaz");
-            }else if (tutar > bakiye)
-            {
-                Console.WriteLine("Yetersiz bakiye !");
-            }
-            else
-            {
-                bakiye -= tutar;
-            }
-        }
-
-        public decimal Bakiye()
-        {
-            return bakiye;
-        }
-
+### 📐 Örnek — Şekiller ve Alan Hesabı
+```mermaid
+classDiagram
+    class Sekil {
+      <<abstract>>
+      +Alan() double
     }
-}
-```
-
-Örnek 2 — Ürün: Doğrulama ve Yuvarlama
-```csharp
-public class Urun
-{
-    private string _ad;
-    private decimal _fiyat;
-
-    public Urun(string ad, decimal fiyat)
-    {
-        _ad = string.IsNullOrWhiteSpace(ad) ? throw new ArgumentException("Ad boş") : ad.Trim();
-        _fiyat = fiyat >= 0 ? decimal.Round(fiyat, 2) : throw new ArgumentOutOfRangeException(nameof(fiyat));
+    class Ucgen {
+      +taban: double
+      +yukseklik: double
+      +Alan() double
     }
-
-    public string Ad() => _ad;
-    public decimal Fiyat() => _fiyat;
-
-    public void ZamYap(decimal yuzde)
-    {
-        if (yuzde <= 0) throw new ArgumentOutOfRangeException(nameof(yuzde));
-        _fiyat = decimal.Round(_fiyat * (1 + yuzde / 100m), 2);
+    class Daire {
+      +r: double
+      +Alan() double
     }
-}
+    Sekil <|-- Ucgen
+    Sekil <|-- Daire
 ```
+Burada “Sekil” soyut bir üst sınıf olarak ortak bir sözleşme sağlar. “Ucgen” ve “Daire” bu sözleşmeyi farklı biçimlerde hayata geçirir. İstemci kod, “Sekil” üzerinden konuşur; somut türün ayrıntısına bağımlı değildir.
 
-Örnek 3 — Email Değer Nesnesi
-```csharp
-public class Email
-{
-    public string Deger { get; }
-    public Email(string deger)
-    {
-        if (string.IsNullOrWhiteSpace(deger)) throw new ArgumentException("E-posta boş");
-        var s = deger.Trim();
-        if (!s.Contains("@") || s.StartsWith("@") || s.EndsWith("@")) throw new ArgumentException("Geçersiz e-posta");
-        Deger = s;
+## 🔻 Arayüz (Interface) ve Realization
+- Arayüzler “ne yapılacağı”nı söyler, “nasıl yapılacağı”nı değil.
+- Birden fazla sınıf aynı arayüzü farklı yaklaşımlarla gerçekleştirebilir; bu da sistemde strateji değişimini kolaylaştırır.
+- Arayüzler, istemci kod ile hizmet sağlayıcılar arasına açık bir sözleşme koyar.
+
+### 📐 Örnek — Yazdırılabilir Varlıklar
+```mermaid
+classDiagram
+    class IYazdirilabilir {
+      <<interface>>
+      +Yazdir() void
     }
-    public override string ToString() => Deger;
-}
-```
-
-Örnek 4 — Kullanici: Değer Nesnesi ile Kapsülleme
-```csharp
-public class Kullanici
-{
-    private Email _email;
-    public Kullanici(Email email) => _email = email ?? throw new ArgumentNullException(nameof(email));
-    public Email Email() => _email;
-    public void EmailGuncelle(Email yeni) => _email = yeni ?? throw new ArgumentNullException(nameof(yeni));
-}
-```
-
-Örnek 5 — Sepet: Koleksiyon Kapsülleme
-```csharp
-public class SepetKalemi
-{
-    public int UrunId { get; }
-    public int Adet { get; }
-    public SepetKalemi(int urunId, int adet)
-    {
-        if (urunId <= 0) throw new ArgumentOutOfRangeException(nameof(urunId));
-        if (adet <= 0) throw new ArgumentOutOfRangeException(nameof(adet));
-        UrunId = urunId; Adet = adet;
+    class Fatura {
+      +no: string
+      +Yazdir() void
     }
-    public decimal AraToplam(decimal fiyat) => decimal.Round(fiyat * Adet, 2);
-}
-
-public class Sepet
-{
-    private readonly List<SepetKalemi> _kalemler = new();
-    public void Ekle(SepetKalemi kalem) => _kalemler.Add(kalem ?? throw new ArgumentNullException(nameof(kalem)));
-    public int Sil(Func<SepetKalemi, bool> p) => _kalemler.RemoveAll(k => p(k));
-    public IReadOnlyCollection<SepetKalemi> Kalemler() => _kalemler.AsReadOnly();
-}
-```
-
-Örnek 6 — Kisi: Doğrulama + Salt-Okunur Telefonlar
-```csharp
-public class Kisi
-{
-    private string _ad;
-    private readonly List<string> _telefonlar = new();
-    public Kisi(string ad) => _ad = string.IsNullOrWhiteSpace(ad) ? throw new ArgumentException("Ad boş") : ad.Trim();
-    public string Ad() => _ad;
-    public void AdGuncelle(string ad) => _ad = string.IsNullOrWhiteSpace(ad) ? throw new ArgumentException("Ad boş") : ad.Trim();
-    public void TelefonEkle(string tel)
-    {
-        if (string.IsNullOrWhiteSpace(tel)) throw new ArgumentException("Tel boş");
-        _telefonlar.Add(tel.Trim());
+    class Rapor {
+      +ad: string
+      +Yazdir() void
     }
-    public IReadOnlyList<string> Telefonlar() => _telefonlar.AsReadOnly();
-}
+    IYazdirilabilir <|.. Fatura
+    IYazdirilabilir <|.. Rapor
 ```
+Aynı arayüz farklı sınıflarca farklı biçimde uygulanabilir. İstemci, “IYazdirilabilir” üzerinden çalışarak somut sınıflara bağımlılığını azaltır.
+
+## 🧭 İlkeler ve İpuçları (Kavramsal)
+- LSP (Liskov Substitution Principle): Alt tür, üst türün beklenen davranışlarını bozmayacak şekilde onun yerine geçebilmelidir. Bu, kalıtımın güvenli kullanılmasının temel ölçütüdür.
+- ISP (Interface Segregation Principle): Arayüzler küçük, odaklı ve amaca uygun olmalıdır. “Şişkin” arayüzler, istemcileri gereksiz metotları uygulamaya zorlar.
+- DIP (Dependency Inversion Principle): Yüksek seviye modüller, düşük seviye detaylara değil, soyutlamalara bağımlı olmalıdır. Bu, bağımlılıkların gevşek bağlanmasını sağlar.
+- Bileşim Tercihi: Kod paylaşımı için kalıtım yerine önce bileşim (has-a) düşünün. Kalıtım, davranışsal uzmanlaşma için uygundur; sadece ortak kodu “kolayca kopyalamamak” adına seçilmemelidir.
+
+## 📝 Alıştırmalar
+1) “Ödeme” (soyut üst sınıf) → “KrediKartı/Havale/Nakit” (alt sınıflar) hiyerarşisini generalization ile çizin; her alt sınıfın neden üst sınıf yerine geçebildiğini LSP açısından tartışın.
+2) “ILoglayici” arayüzünü ve “KonsolLog/DosyaLog” gibi iki farklı gerçekleştirmeyi realization ile gösterin; strateji değiştirme senaryosu yazın (ne zaman hangisini seçersiniz?).
+3) Mevcut bir sisteminizde (okul, kütüphane, e-ticaret vb.) kalıtım mı yoksa bileşim mi daha doğru? Bir örnekle gerekçe yazın.
+
+## 📚 Önerilen Okuma
+- Generalization ve Realization: https://www.uml-diagrams.org/generalization.html  
+- Arayüzler ve sözleşmeler: https://www.uml-diagrams.org/class-diagrams-interfaces.html
+
+---
