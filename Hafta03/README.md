@@ -139,31 +139,36 @@ public class Urun
 }
 ```
 
-Örnek 3 — Email Değer Nesnesi
+Örnek 3 — Kullanici: Değer Nesnesi ile Kapsülleme
 ```csharp
-public class Email
-{
-    public string Deger { get; }
-    public Email(string deger)
-    {
-        if (string.IsNullOrWhiteSpace(deger)) throw new ArgumentException("E-posta boş");
-        var s = deger.Trim();
-        if (!s.Contains("@") || s.StartsWith("@") || s.EndsWith("@")) throw new ArgumentException("Geçersiz e-posta");
-        Deger = s;
-    }
-    public override string ToString() => Deger;
-}
-```
+ public class Kullanici
+ {
+     private string ad;
+     private string soyad;
+     private DateTime dogumTarihi;
 
-Örnek 4 — Kullanici: Değer Nesnesi ile Kapsülleme
-```csharp
-public class Kullanici
-{
-    private Email _email;
-    public Kullanici(Email email) => _email = email ?? throw new ArgumentNullException(nameof(email));
-    public Email Email() => _email;
-    public void EmailGuncelle(Email yeni) => _email = yeni ?? throw new ArgumentNullException(nameof(yeni));
-}
+     public int Yas
+     {
+         get
+         {
+             return DateTime.Now.Year-dogumTarihi.Year;
+         }
+     }
+     public string TamBilgi
+     {
+         get
+         {
+             return $"Ad:{ad}\nSoyad:{soyad}\nYaş:{Yas}";
+         }
+     }
+     
+     public Kullanici(string ad, string soyad, DateTime dogumTarihi)
+     {
+         this.ad = ad;
+         this.soyad = soyad;
+         this.dogumTarihi = dogumTarihi;
+     }
+ }
 ```
 
 Örnek 5 — Sepet: Koleksiyon Kapsülleme
