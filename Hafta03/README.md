@@ -40,7 +40,8 @@ classDiagram
     class Person {
       -name: string
       -password:string
-      +Password:string~get~
+      +Name:string~get~~set~
+      +Password:string~get~~set~
     }
     
 ```
