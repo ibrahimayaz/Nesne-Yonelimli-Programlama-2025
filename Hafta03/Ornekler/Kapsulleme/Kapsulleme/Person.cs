@@ -4,7 +4,6 @@ namespace Kapsulleme
     public class Person
     {
         private string name; // field
-
         private string password;
 
         public string Name   // property
