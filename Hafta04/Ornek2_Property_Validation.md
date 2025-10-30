@@ -15,28 +15,43 @@ using System;
 
 public class BankaHesabi
 {
-    private decimal balance;
+    private decimal bakiye;
 
-    public BankaHesabi(decimal initial)
+    public BankaHesabi(decimal baslangicBakiyesi)
     {
-        if (initial < 0) throw new ArgumentException("Başlangıç bakiyesi negatif olamaz.");
-        balance = initial;
+        if (baslangicBakiyesi < 0){
+            Console.WriteLine("Başlangıç bakiyesi negatif olamaz.");
+        }else{
+            bakiye = baslangicBakiyesi;
+        }
     }
 
     // Salt okunur property — dışarıya sadece okunabilir
-    public decimal Balance => balance;
+    public decimal Bakiye{
+        get{
+            return bakiye;
+        }
+    };
 
-    public void Deposit(decimal amount)
+    public void ParaYatir(decimal miktar)
     {
-        if (amount <= 0) throw new ArgumentException("Yatırılan tutar pozitif olmalı.");
-        balance += amount;
+        if (miktar <= 0){
+            Console.WriteLine("Yatırılan tutar pozitif olmalı.");
+        }else{
+            bakiye += miktar;
+        }
     }
 
-    public void Withdraw(decimal amount)
+    public void ParaCek(decimal miktar)
     {
-        if (amount <= 0) throw new ArgumentException("Çekilen tutar pozitif olmalı.");
-        if (amount > balance) throw new InvalidOperationException("Yetersiz bakiye.");
-        balance -= amount;
+        if (miktar <= 0){
+            Console.WriteLine("Çekilen tutar pozitif olmalı.");
+        }
+        else if (miktar > bakiye){
+            Console.WriteLine("Yetersiz bakiye.");
+        }else{
+            balance -= amount;
+        }
     }
 }
 
@@ -47,16 +62,10 @@ public class Program
     {
         var h = new BankaHesabi(1000m);
         Console.WriteLine($"Başlangıç: {h.Balance}");
-        h.Deposit(250m);
+        h.ParaYatir(250);
         Console.WriteLine($"Yatırma sonrası: {h.Balance}");
-        try
-        {
-            h.Withdraw(2000m);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Hata: {ex.Message}");
-        }
+        h.ParaCek(2000);
+        
     }
 }
 ```
