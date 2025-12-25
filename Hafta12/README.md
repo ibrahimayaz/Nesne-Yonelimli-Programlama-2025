@@ -59,19 +59,19 @@ OdemeYap(new HavaleOdemesi(), 200);
 ```csharp
 abstract class Depo
 {
-	public abstract int Kapasite { get; }
+	public abstract int Kapasite { get; set; }
 
 	public void Yazdir() => Console.WriteLine($"Kapasite: {Kapasite}");
 }
 
 class HafizaDeposu : Depo
 {
-	public override int Kapasite { get; } = 256; // GB
+	public override int Kapasite { get; set; } = 256; // GB
 }
 
 class BulutDeposu : Depo
 {
-	public override int Kapasite { get; } = 1024;
+	public override int Kapasite { get; set; } = 1024;
 }
 
 Depo[] depolar = { new HafizaDeposu(), new BulutDeposu() };
