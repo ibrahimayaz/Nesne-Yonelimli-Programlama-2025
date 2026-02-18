@@ -36,6 +36,7 @@ Bu analojiler, “sınıf = tanım/şablon, nesne = somut örnek” fikrini peki
 
 ## 🧱 OOP’nin Temel Özellikleri (Tanımsal)
 - 🔒 Kapsülleme (Encapsulation): Veriyi ve o veriyi yöneten davranışları bir arada tutup dış dünyaya kontrollü bir arayüz sunar. Gereksiz iç ayrıntılar gizlenerek tutarlılık korunur.
+![kapsulleme](https://miro.medium.com/v2/resize:fit:1100/format:webp/1*XRJTnJVhyz-8segLNNawpQ.png)
 - 🧭 Soyutlama (Abstraction): Önemli olana odaklanma, gereksiz ayrıntıları gizleme yaklaşımıdır. Model daha sade ve amaca uygundur.
 - 🧬 Kalıtım (Inheritance): Ortak özellik ve davranışları üst bir yapı altında toplayıp alt yapılara devretmektir (is-a ilişki mantığı). Kod tekrarını azaltır.
 - 🌀 Çok Biçimlilik (Polymorphism): Aynı arayüz veya işlem çağrısının, farklı türler tarafından farklı biçimde uygulanabilmesidir. Genişletilebilir ve esnek tasarımlara kapı açar.
