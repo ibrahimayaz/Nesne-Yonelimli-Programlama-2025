@@ -29,7 +29,7 @@ Bu hafta, UML’nin (Unified Modeling Language) amacını, kapsamını ve özell
   - 🔻 Realization (arayüz gerçekleştirme): Bir arayüzün somut sınıflarca uygulanması.
 - Navigability (yönlülük): İlişkinin hangi yönde erişim/bağımlılık içerdiğini belirtir; diyagram okunabilirliğini artırır.
 - Multiplicity (çokluk): 1, 0..1, *, 1..* gibi notasyonlarla tarafların kaç örnek üzerinden ilişki kurduğunu gösterir.
-
+![iliskiler](iliskiler.png)
 ## 📐 Örnek A — Kütüphane Modeli
 Bu model, “Yazar” ve “Yayınevi”nin çok sayıda “Kitap” ile ilişkisini ortaya koyar.
 ```mermaid
