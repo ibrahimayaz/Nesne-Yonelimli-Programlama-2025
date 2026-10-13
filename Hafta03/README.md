@@ -233,7 +233,7 @@ Sınıf diyagramında sınıflar arasında ilişkiler kurulur. Bu ilişkiler, ne
 
 ### 6.1) Association (İlişki)
 
-Association, iki sınıfın birbirine bir şekilde bağlı olduğu ama birinin diğerinin içinde yaşamadığı ilişkidir.
+Association, iki sınıfın nesneleri arasındaki bağlantıdır. Bu bağlantıda nesneler birbirinin parçası değildir.
 
 En basit örnek: Bir öğrenci bir dersin içinde olabilir ama ders, öğrencinin bir parçası değildir.
 
@@ -356,9 +356,9 @@ Bu ilişki şu anlama gelir:
 
 ### 6.5) Basit hatırlama yöntemi
 
-- Association = tanışma
-- Aggregation = sahip olmak ama bağımsız kalmak
-- Composition = parçanın bütünün içinde yaşaması
+- Association = iki nesne arasında bağlantı vardır.
+- Aggregation = bütün, parçaları bir arada tutar; parçalar tek başına da var olabilir.
+- Composition = parçalar bütüne bağlıdır; bütün ortadan kalkarsa parçalar da varlığını yitirir.
 
 ## 7) Sınıf diyagramı neden kullanılır?
 

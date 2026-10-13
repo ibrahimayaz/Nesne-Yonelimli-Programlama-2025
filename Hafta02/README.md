@@ -24,7 +24,7 @@ Bu hafta, UML’nin (Unified Modeling Language) amacını, kapsamını ve özell
 - İlişki türleri:
   - 🔗 Association: Sınıflar arası genel ilişki (ör. “Öğrenci ders alır”).
   - ◇ Aggregation (zayıf sahiplik): Bütün–parça ilişkisi; parça bağımsız yaşayabilir (ör. “Ekip — Üye”).
-  - ◆ Composition (güçlü sahiplik): Parça bütünün yaşam döngüsüne bağlıdır (ör. “Sipariş — SiparişKalemi”).
+  - ◆ Composition (güçlü sahiplik): Parça bütünün yaşam döngüsüne bağlıdır (ör. “Kitap — Sayfa”).
   - 🔺 Generalization (kalıtım): Üst–alt sınıf hiyerarşisi (is-a ilişkisi).
   - 🔻 Realization (arayüz gerçekleştirme): Bir arayüzün somut sınıflarca uygulanması.
 - Navigability (yönlülük): İlişkinin hangi yönde erişim/bağımlılık içerdiğini belirtir; diyagram okunabilirliğini artırır.
@@ -50,45 +50,66 @@ classDiagram
 ```
 - Not: Burada association kullanılmıştır; bir kitap yalnızca bir yayıneviyle ilişkilendirilebilir varsayımı sistem kurallarınıza göre değişebilir.
 
-## 📐 Örnek B — Sepet, SepetKalemi, Urun (Composition)
-“SepetKalemi” varlığının yaşamı genellikle “Sepet”e bağlıdır; bu nedenle composition uygundur.
+## 📐 Örnek B — Kitap ve Sayfa (Composition)
+Bir sayfa, bu örnekte yalnızca ait olduğu kitabın parçası olarak var olur; bu nedenle composition uygundur.
 ```mermaid
 classDiagram
-    class Urun {
-      +ad: string
-      +fiyat: decimal
+    class Kitap {
+      +baslik: string
     }
-    class SepetKalemi {
-      +adet: int
-      +AraToplam() decimal
-    }
-    class Sepet {
-      +Toplam() decimal
+    class Sayfa {
+      +sayfaNumarasi: int
     }
 
-    Sepet *-- "*" SepetKalemi : composition
-    SepetKalemi --> "1" Urun : association
+    Kitap *-- "*" Sayfa : composition
 ```
-- Gerekçe: Sepet silindiğinde “SepetKalemi” de anlamını yitirir; bu güçlü sahiplik bağıdır.
+- Gerekçe: Kitap kaldırıldığında sayfalar da o kitabın parçası olma özelliğini yitirir.
 
-## 📐 Örnek C — Roller ve Yetkiler (Çoktan Çoğa)
-Kullanıcıların birden fazla role sahip olabildiği, rollerin de birden fazla kullanıcıya atanabildiği senaryolarda çoktan–çoğa ilişkiler ortaya çıkar.
+## 📐 Örnek C — Ev ve Oda (Composition)
+Bu örnekte odalar, evin parçalarıdır ve tek başlarına ayrı bir evin odası olarak var olamazlar; bu nedenle composition kullanılır.
 ```mermaid
 classDiagram
-    class Kullanici {
-      +kullaniciAdi: string
+    class Ev {
+      +adres: string
     }
-    class Rol {
+    class Oda {
+      +odaNumarasi: int
+    }
+
+    Ev "1" *-- "1..*" Oda : icerir
+```
+- Gerekçe: Ev ortadan kalktığında, ona ait odalar da bu modelde varlığını yitirir.
+
+## 📐 Aggregation Örnekleri
+Aggregation’da bütün ile parçaları arasında zayıf sahiplik vardır; bütün silinse bile parçalar var olmaya devam edebilir. Mermaid diyagramlarında boş baklava `o` aggregation ilişkisini gösterir.
+
+### Örnek 1 — Takım ve Oyuncu
+Bir takım oyunculardan oluşur; takım dağılsa bile oyuncular var olmaya devam eder.
+```mermaid
+classDiagram
+    class Takim {
       +ad: string
     }
-    class Yetki {
+    class Oyuncu {
       +ad: string
     }
 
-    Kullanici "*" -- "*" Rol : atama
-    Rol "*" -- "*" Yetki : kapsar
+    Takim "1" o-- "*" Oyuncu : oyunculari
 ```
-- Not: Gerçek sistemlerde bu çoktan–çoğa ilişkiler genellikle ilişki (köprü) sınıflarıyla (örn. KullaniciRol) normalize edilir.
+
+### Örnek 2 — Çalma Listesi ve Şarkı
+Bir çalma listesi şarkıları içerir; liste silinse bile şarkılar kütüphanede kalır ve başka listelerde kullanılabilir.
+```mermaid
+classDiagram
+    class CalmaListesi {
+      +ad: string
+    }
+    class Sarki {
+      +baslik: string
+    }
+
+    CalmaListesi "*" o-- "*" Sarki : sarkilari
+```
 
 ## 🧯 Aggregation vs Composition — Seçim Ölçütleri
 - Parça bağımsız var olabilir mi? Evetse aggregation, hayırsa composition.

@@ -1,23 +1,319 @@
 # Hafta 04 — Kapsülleme (Encapsulation)
 
-Bu klasör Hafta 04 kapsamında kapsülleme (encapsulation) konusuna yönelik örnek dosyalarını içerir. Örnekler C# dili ile yazılmıştır ve amaç ders notu / gösterim amaçlı açıklama + kod parçacıkları sunmaktır.
+## Kapsülleme nedir?
 
-İçerik:
+Kapsülleme, bir nesnenin verilerini dışarıdan doğrudan değiştirmeye kapatıp bu verilere kontrollü erişim sağlamaktır. Sınıf, verinin nasıl okunacağını veya değiştirileceğini belirler.
 
-- `Ornek1_Kapsulleme_Basic.md` — Temel kapsülleme: private alanlar, public metotlar
-- `Ornek2_Property_Validation.md` — Özellikler (properties) ve doğrulama (validation)
-- `Ornek3_PrivateMethods.md` — Özel (private) yardımcı metotlar ile iç durum yönetimi
-- `Ornek4_Properties_Ile_Kapsulleme.md` — Properties ile kapsülleme: private set, doğrulamalı setter, hesaplanan ve init-only özellikler
-- `Ornek5_Kapsulleme_Basit.md` — 5 küçük ve hızlı kapsülleme senaryosu (salt okunur alan, backing field doğrulama, private set, hesaplanan property, metotla güvenli değişim)
- - `Ornek6_AutoProperty_PrivateSet.md` — Auto-property ve private set ile kontrollü değişim (GameScore)
- - `Ornek7_RangeChecked_Property.md` — Aralık kontrolü yapan property ve türetilmiş değerler (Temperature)
- - `Ornek8_ReadOnly_Computed.md` — Read-only hesaplanan properties (Rectangle)
- - `Ornek9_Lazy_Property.md` — Lazy hesaplanan property ve invalidation (Profile)
- - `Ornek10_Collection_Encapsulation.md` — Koleksiyon kapsüllemesi, IReadOnlyList ile güvenli yayın (Classroom)
+Örneğin bir banka hesabının bakiyesi herkes tarafından istenildiği gibi değiştirilememelidir. Para yatırma ve çekme işlemleri kurallara uygun şekilde yapılmalıdır.
 
-Kullanım:
+C# dilinde kapsülleme için sık kullanılan araçlar:
 
-1. Bu dosyalardaki C# kodlarını örneğin bir konsol uygulamasına (`Program.cs`) yapıştırıp derleyebilirsiniz.
-2. Ders sırasında her örneği adım adım gösterin: önce sınıf tasarımı, sonra dışarıdan erişim denemeleri, son olarak düzeltmeler/iyileştirmeler.
+- `private`: Alana veya metoda yalnızca aynı sınıf içinden erişilebilir.
+- `public`: Sınıfın dışından erişilebilir.
+- Özellikler (properties) ve metotlar: Sınıfın verilerine kontrollü erişim sağlar.
 
-Not: Gerekirse bu klasöre çalışır örnek `*.csproj` ve `Program.cs` dosyaları da ekleyebilirim.
+Sınıf diyagramlarında `-` işareti `private`, `+` işareti `public` anlamına gelir. Aşağıdaki her örnekte önce sınıf diyagramı, ardından C# kodu verilmiştir.
+
+## Örnek 1 — Banka hesabı
+
+Bakiye dışarıdan doğrudan değiştirilemez. Para yatırma ve çekme işlemleri hesap kurallarını kontrol eder.
+
+### Sınıf diyagramı
+
+```mermaid
+classDiagram
+    class BankaHesabi {
+      -bakiye: decimal
+      +Bakiye: decimal
+      +ParaYatir(tutar: decimal) bool
+      +ParaCek(tutar: decimal) bool
+    }
+```
+
+### C# kodu
+
+```csharp
+using System;
+
+class BankaHesabi
+{
+    private decimal _bakiye;
+
+    public decimal Bakiye
+    {
+        get { return _bakiye; }
+    }
+
+    public bool ParaYatir(decimal tutar)
+    {
+        if (tutar <= 0)
+            return false;
+
+        _bakiye += tutar;
+        return true;
+    }
+
+    public bool ParaCek(decimal tutar)
+    {
+        if (tutar <= 0 || tutar > _bakiye)
+            return false;
+
+        _bakiye -= tutar;
+        return true;
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        BankaHesabi hesap = new BankaHesabi();
+
+        hesap.ParaYatir(500);
+        hesap.ParaCek(120);
+
+        Console.WriteLine($"Güncel bakiye: {hesap.Bakiye} TL");
+    }
+}
+```
+
+`_bakiye` alanı `private` olduğu için `hesap._bakiye = -100;` gibi bir atama yapılamaz. Bakiye yalnızca sınıfın sunduğu işlemlerle değişir.
+
+## Örnek 2 — Öğrenci notu
+
+Not yalnızca 0 ile 100 arasında olabilir. Özelliğin `set` bölümü bu kuralı uygular.
+
+### Sınıf diyagramı
+
+```mermaid
+classDiagram
+    class Ogrenci {
+      -not: int
+      +Not: int
+    }
+```
+
+### C# kodu
+
+```csharp
+using System;
+
+class Ogrenci
+{
+    private int _not;
+
+    public int Not
+    {
+        get { return _not; }
+        set
+        {
+            if (value < 0 || value > 100)
+                throw new ArgumentOutOfRangeException(
+                    nameof(value), "Not 0 ile 100 arasında olmalıdır.");
+
+            _not = value;
+        }
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        Ogrenci ogrenci = new Ogrenci();
+        ogrenci.Not = 85;
+        Console.WriteLine($"Öğrenci notu: {ogrenci.Not}");
+    }
+}
+```
+
+Örneğin `ogrenci.Not = 120;` ataması kuralı ihlal ettiği için kabul edilmez.
+
+## Örnek 3 — Dikdörtgen
+
+Dikdörtgenin kenar uzunlukları oluşturulurken kontrol edilir. Alan, kenarlardan hesaplandığı için dışarıdan değiştirilemez.
+
+### Sınıf diyagramı
+
+```mermaid
+classDiagram
+    class Dikdortgen {
+      -genislik: decimal
+      -yukseklik: decimal
+      +Dikdortgen(genislik: decimal, yukseklik: decimal)
+      +Genislik: decimal
+      +Yukseklik: decimal
+      +Alan: decimal
+    }
+```
+
+### C# kodu
+
+```csharp
+using System;
+
+class Dikdortgen
+{
+    private decimal _genislik;
+    private decimal _yukseklik;
+
+    public Dikdortgen(decimal genislik, decimal yukseklik)
+    {
+        if (genislik <= 0)
+            throw new ArgumentOutOfRangeException(nameof(genislik));
+        if (yukseklik <= 0)
+            throw new ArgumentOutOfRangeException(nameof(yukseklik));
+
+        _genislik = genislik;
+        _yukseklik = yukseklik;
+    }
+
+    public decimal Genislik
+    {
+        get { return _genislik; }
+    }
+
+    public decimal Yukseklik
+    {
+        get { return _yukseklik; }
+    }
+
+    public decimal Alan
+    {
+        get { return _genislik * _yukseklik; }
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        Dikdortgen dikdortgen = new Dikdortgen(5, 3);
+        Console.WriteLine($"Dikdörtgenin alanı: {dikdortgen.Alan}");
+    }
+}
+```
+
+`Alan` yalnızca okunabilir. Böylece alanın kenar uzunluklarıyla tutarsız bir değere ayarlanması önlenir.
+
+## Örnek 4 — Lamba
+
+Lambanın açık veya kapalı durumu dışarıdan doğrudan değiştirilemez. Durum, `Ac` ve `Kapat` metotlarıyla değiştirilir.
+
+### Sınıf diyagramı
+
+```mermaid
+classDiagram
+    class Lamba {
+      -acik: bool
+      +Acik: bool
+      +Ac() void
+      +Kapat() void
+    }
+```
+
+### C# kodu
+
+```csharp
+using System;
+
+class Lamba
+{
+    private bool _acik;
+
+    public bool Acik
+    {
+        get { return _acik; }
+    }
+
+    public void Ac()
+    {
+        _acik = true;
+    }
+
+    public void Kapat()
+    {
+        _acik = false;
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        Lamba lamba = new Lamba();
+        lamba.Ac();
+        Console.WriteLine($"Lamba açık mı? {lamba.Acik}");
+
+        lamba.Kapat();
+        Console.WriteLine($"Lamba açık mı? {lamba.Acik}");
+    }
+}
+```
+
+`lamba.Acik = true;` yazılamaz; durumu değiştirmek için sınıfın tanımladığı metotlar kullanılmalıdır.
+
+## Örnek 5 — Sınıf ve öğrenci listesi
+
+Öğrenci listesi sınıf içinde tutulur. Listeyi dışarıya yalnızca okunabilir olarak sunarız; öğrenci ekleme işlemini sınıfın metodu yönetir.
+
+### Sınıf diyagramı
+
+```mermaid
+classDiagram
+    class Sinif {
+      -ogrenciler: List~string~
+      +Ogrenciler: IReadOnlyList~string~
+      +OgrenciEkle(ad: string) void
+    }
+```
+
+### C# kodu
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+class Sinif
+{
+    private List<string> _ogrenciler = new List<string>();
+
+    public IReadOnlyList<string> Ogrenciler
+    {
+        get { return _ogrenciler.AsReadOnly(); }
+    }
+
+    public void OgrenciEkle(string ad)
+    {
+        if (string.IsNullOrWhiteSpace(ad))
+            throw new ArgumentException("Öğrenci adı boş olamaz.", nameof(ad));
+
+        _ogrenciler.Add(ad);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        Sinif sinif = new Sinif();
+        sinif.OgrenciEkle("Ayşe");
+        sinif.OgrenciEkle("Mehmet");
+
+        foreach (string ogrenci in sinif.Ogrenciler)
+        {
+            Console.WriteLine(ogrenci);
+        }
+    }
+}
+```
+
+Listeye sınıf dışından doğrudan öğrenci eklenemez veya listedeki elemanlar silinemez. Listeyi değiştirmek için `OgrenciEkle` metodu kullanılır.
+
+## Kısa özet
+
+- Verileri doğrudan değiştirmeye açmayın; alanları gerektiğinde `private` yapın.
+- Veriye erişim ve değişiklik için anlaşılır `public` özellikler veya metotlar sunun.
+- Değerleri değiştirirken kuralları kontrol edin.
+- Hesaplanabilen veya dışarıdan değiştirilmemesi gereken bilgileri salt okunur sunun.
+
