@@ -14,6 +14,29 @@ C# dilinde kapsülleme için sık kullanılan araçlar:
 
 Sınıf diyagramlarında `-` işareti `private`, `+` işareti `public` anlamına gelir. Aşağıdaki her örnekte önce sınıf diyagramı, ardından C# kodu verilmiştir.
 
+## Field ve Property (Özellik) nedir?
+
+- **Field (alan)**, sınıfın verisini saklayan değişkendir. Kapsüllemede field genellikle `private` yapılır; böylece sınıf dışından doğrudan değiştirilemez.
+- **Property (özellik)**, bir field değerini okumak veya kontrollü biçimde değiştirmek için sınıfın dışarıya sunduğu arayüzdür.
+- `get`, property değerini okumayı sağlar. Aşağıdaki örnekte `Ad` okunduğunda `_ad` değeri döndürülür.
+- `set`, property değerini değiştirmeyi sağlar. Yeni değer `value` adlı özel değişkende bulunur.
+- `get` veya `set` tek başına da kullanılabilir. Örneğin yalnızca `get` varsa değer dışarıdan okunabilir ama değiştirilemez; `private set` varsa değer sadece sınıf içinden değiştirilebilir.
+
+```csharp
+class Kisi
+{
+    private string _ad; // Field: veri burada saklanır.
+
+    public string Ad // Property: field'a kontrollü erişim sağlar.
+    {
+        get { return _ad; }
+        set { _ad = value; }
+    }
+}
+```
+
+`Kisi` sınıfının dışından `kisi.Ad` okunabilir ve `kisi.Ad = "Ayşe";` ile değiştirilebilir. `_ad` alanına ise doğrudan erişilemez.
+
 ## Örnek 1 — Banka hesabı
 
 Bakiye dışarıdan doğrudan değiştirilemez. Para yatırma ve çekme işlemleri hesap kurallarını kontrol eder.
@@ -23,7 +46,7 @@ Bakiye dışarıdan doğrudan değiştirilemez. Para yatırma ve çekme işlemle
 ```mermaid
 classDiagram
     class BankaHesabi {
-      -bakiye: decimal
+      -_bakiye: decimal
       +Bakiye: decimal
       +ParaYatir(tutar: decimal) bool
       +ParaCek(tutar: decimal) bool
@@ -88,7 +111,7 @@ Not yalnızca 0 ile 100 arasında olabilir. Özelliğin `set` bölümü bu kural
 ```mermaid
 classDiagram
     class Ogrenci {
-      -not: int
+      -_not: int
       +Not: int
     }
 ```
@@ -138,8 +161,8 @@ Dikdörtgenin kenar uzunlukları oluşturulurken kontrol edilir. Alan, kenarlard
 ```mermaid
 classDiagram
     class Dikdortgen {
-      -genislik: decimal
-      -yukseklik: decimal
+      -_genislik: decimal
+      -_yukseklik: decimal
       +Dikdortgen(genislik: decimal, yukseklik: decimal)
       +Genislik: decimal
       +Yukseklik: decimal
@@ -205,7 +228,7 @@ Lambanın açık veya kapalı durumu dışarıdan doğrudan değiştirilemez. Du
 ```mermaid
 classDiagram
     class Lamba {
-      -acik: bool
+      -_acik: bool
       +Acik: bool
       +Ac() void
       +Kapat() void
@@ -262,7 +285,7 @@ class Program
 ```mermaid
 classDiagram
     class Sinif {
-      -ogrenciler: List~string~
+      -_ogrenciler: List~string~
       +Ogrenciler: IReadOnlyList~string~
       +OgrenciEkle(ad: string) void
     }
@@ -316,4 +339,3 @@ Listeye sınıf dışından doğrudan öğrenci eklenemez veya listedeki elemanl
 - Veriye erişim ve değişiklik için anlaşılır `public` özellikler veya metotlar sunun.
 - Değerleri değiştirirken kuralları kontrol edin.
 - Hesaplanabilen veya dışarıdan değiştirilmemesi gereken bilgileri salt okunur sunun.
-
