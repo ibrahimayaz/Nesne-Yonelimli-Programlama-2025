@@ -235,17 +235,18 @@ Sınıf diyagramında sınıflar arasında ilişkiler kurulur. Bu ilişkiler, ne
 
 Association, iki sınıfın nesneleri arasındaki bağlantıdır. Bu bağlantıda nesneler birbirinin parçası değildir.
 
-En basit örnek: Bir öğrenci bir dersin içinde olabilir ama ders, öğrencinin bir parçası değildir.
+En basit örnek: Bir öğrenci bir dersi alabilir. Öğrenci, ders nesnesine başvuruyla erişir; ders öğrencinin bir parçası değildir.
 
 ```csharp
-class Ogrenci
-{
-    public string ad;
-}
-
 class Ders
 {
     public string dersAdi;
+}
+
+class Ogrenci
+{
+    public string ad;
+    public Ders alinacakDers;
 }
 ```
 
@@ -255,20 +256,21 @@ Mermaid diyagramı:
 classDiagram
     class Ogrenci {
         +ad: string
+        +alinacakDers: Ders
     }
 
     class Ders {
         +dersAdi: string
     }
 
-    Ogrenci --> Ders
+    Ogrenci --> Ders : alir
 ```
 
 Bu ilişki şu anlama gelir:
 
-- Öğrenci ile ders arasında bağlantı vardır.
-- Ama ders, öğrencinin bir parçası değildir.
-- Öğrenci ders alabilir; ders de öğrenciye ait olabilir.
+- `Ogrenci`, aldığı `Ders` nesnesine `alinacakDers` alanı üzerinden erişir.
+- İki sınıf arasında association (ilişki) vardır.
+- `Ders`, `Ogrenci` tarafından oluşturulup sahiplenilmediği için öğrencinin bir parçası değildir.
 
 ### 6.2) Aggregation (Toplama)
 

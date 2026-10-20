@@ -278,7 +278,7 @@ class Program
 
 ## Örnek 5 — Sınıf ve öğrenci listesi
 
-Öğrenci listesi sınıf içinde tutulur. Listeyi dışarıya yalnızca okunabilir olarak sunarız; öğrenci ekleme işlemini sınıfın metodu yönetir.
+Öğrenci listesi sınıfın içinde tutulur. Dışarıdaki kod öğrenci sayısını öğrenebilir ve öğrencileri tek tek görebilir; listeye ekleme işlemini ise sınıfın metodu yönetir.
 
 ### Sınıf diyagramı
 
@@ -286,7 +286,8 @@ class Program
 classDiagram
     class Sinif {
       -_ogrenciler: List~string~
-      +Ogrenciler: IReadOnlyList~string~
+      +OgrenciSayisi: int
+      +OgrenciGetir(index: int) string
       +OgrenciEkle(ad: string) void
     }
 ```
@@ -301,9 +302,14 @@ class Sinif
 {
     private List<string> _ogrenciler = new List<string>();
 
-    public IReadOnlyList<string> Ogrenciler
+    public int OgrenciSayisi
     {
-        get { return _ogrenciler.AsReadOnly(); }
+        get { return _ogrenciler.Count; }
+    }
+
+    public string OgrenciGetir(int index)
+    {
+        return _ogrenciler[index];
     }
 
     public void OgrenciEkle(string ad)
@@ -323,15 +329,15 @@ class Program
         sinif.OgrenciEkle("Ayşe");
         sinif.OgrenciEkle("Mehmet");
 
-        foreach (string ogrenci in sinif.Ogrenciler)
+        for (int i = 0; i < sinif.OgrenciSayisi; i++)
         {
-            Console.WriteLine(ogrenci);
+            Console.WriteLine(sinif.OgrenciGetir(i));
         }
     }
 }
 ```
 
-Listeye sınıf dışından doğrudan öğrenci eklenemez veya listedeki elemanlar silinemez. Listeyi değiştirmek için `OgrenciEkle` metodu kullanılır.
+Dışarıdaki kod `_ogrenciler` listesine doğrudan erişemediği için listeye öğrenci ekleyemez veya listeden öğrenci silemez. Öğrencileri görmek için `OgrenciSayisi` ve `OgrenciGetir` kullanılır; eklemek için `OgrenciEkle` çağrılır. Böylece listeyi değiştirme yetkisi `Sinif` sınıfında kalır ve ekleme sırasında ad kontrolü yapılabilir.
 
 ## Kısa özet
 
