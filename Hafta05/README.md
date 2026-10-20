@@ -1,101 +1,229 @@
-# 🧬 Hafta03 — Kalıtım, Çok Biçimlilik (Teori) ve UML Generalization/Realization
+# Hafta 05 — Kalıtım
 
-Üçüncü haftada OOP’nin davranış odaklı temel ilkelerini teorik düzeyde ele alıyoruz. Özellikle “kalıtım” (generalization) ve “çok biçimlilik” (polymorphism) kavramlarının neden ve nasıl kullanılması gerektiğini, arayüz (interface) sözleşmeleriyle birlikte UML üzerinde ifade edeceğiz. Bu haftada da kod ayrıntısına girmeden, kavramsal doğruluğa ve görselleştirmeye odaklanıyoruz.
+Bu hafta yalnızca **kalıtımın temel kullanımını** öğreneceğiz. Basit bir örnekle başlayıp aynı üst sınıftan türeyen sınıfları ve birden fazla düzeyden oluşan sınıf hiyerarşisini inceleyeceğiz. Her örnekte önce sınıf diyagramı, ardından bu diyagrama karşılık gelen C# kodu yer alır.
 
-## 🎯 Öğrenme Hedefleri
-- 🔺 Kalıtımın (generalization) doğru kullanım alanlarını ve sınırlarını kavramak.
-- 🌀 Çok biçimliliğin (polymorphism) esneklik ve genişletilebilirlik sağlama biçimlerini anlamak.
-- 🔻 Arayüz gerçekleştirme (realization) ilişkisini UML ile doğru ifade edebilmek.
+## Öğrenme hedefleri
 
-## 🧬 Kalıtım (Generalization) — Ne Zaman?
-- Paylaşılan özellik ve davranışları üst bir sınıfta toplamak istediğinizde uygundur.
-- “is-a” testi: Alt tür gerçekten üst türün özel bir hali mi? Bu soru dürüstçe “evet”se kalıtım uygundur.
-- Aşırı kalıtım kokuları: Sırf kod paylaşmak için kalıtım kullanmak; uygun değilse bileşim (has-a) tercih edilmelidir.
-- Yararları: Kod tekrarını düşürür, ortak sözleşme sunar.
-- Riskleri: Yanlış hiyerarşi, kırılgan temeller ve zor anlaşılan bağımlılıklar oluşturabilir.
+Bu dokümanın sonunda:
 
-### 📐 Örnek — Taşıt Hiyerarşisi
+- Kalıtımın ne zaman kullanılacağını açıklayabilecek,
+- Bir alt sınıfı `:` işaretiyle tanımlayabilecek,
+- Üst sınıfın özelliklerini alt sınıfta kullanabilecek,
+- Aynı üst sınıftan türeyen sınıfları ve çok düzeyli bir sınıf hiyerarşisini tanıyabileceksiniz.
+
+## 1. Kalıtım nedir?
+
+Kalıtım, ortak özellik ve davranışları bir **üst sınıfta** tanımlayıp bunları daha özel **alt sınıflarda** kullanmamızı sağlar.
+
+Örneğin her öğrencinin adı ve soyadı vardır. Öğrenciye özgü öğrenci numarası ve bölüm bilgisi de bulunur. `Ogrenci`, ortak kişi bilgilerini `Kisi` sınıfından alabilir.
+
+Bir alt sınıf gerçekten üst sınıfın özel bir türü olmalıdır. “Öğrenci bir kişi midir?” sorusunun cevabı evet olduğu için bu örnekte kalıtım uygundur.
+
+### Örnek 1 — Kişi ve öğrenci
+
+**Sınıf diyagramı**
+
 ```mermaid
 classDiagram
-    class Arac {
-      +hiz: int
-      +Calistir() void
+    class Kisi {
+        +Ad: string
+        +Soyad: string
     }
-    class Araba {
-      +kapiSayisi: int
+
+    class Ogrenci {
+        +OgrenciNo: int
+        +Bolum: string
     }
-    class Motosiklet {
-      +yanDestekVar: bool
-    }
-    Arac <|-- Araba
-    Arac <|-- Motosiklet
+
+    Kisi <|-- Ogrenci
 ```
-Bu diyagramda “Araba” ve “Motosiklet”, “Arac”ın özel örnekleridir. Ortak davranış (örn. çalıştırma) üst sınıfta, özgün nitelikler alt sınıflardadır.
 
-## 🌀 Çok Biçimlilik (Polymorphism) — Neden Gerekli?
-- Aynı işlem çağrısının (örn. “Alan()”) farklı türlerde farklı sonuçlar üretmesine olanak tanır.
-- Yeni varyantlar eklendiğinde mevcut kodu en az etkiyle genişletebilmek için kullanılır.
-- Bağımlılıkların soyutlamalara (üst sınıf/arayüz) bağlanmasını teşvik eder, böylece modüller arası bağımlılık zayıflar.
+**C# kodu**
 
-### 📐 Örnek — Şekiller ve Alan Hesabı
+```csharp
+using System;
+
+class Kisi
+{
+    public string Ad { get; set; } = "";
+    public string Soyad { get; set; } = "";
+}
+
+class Ogrenci : Kisi
+{
+    public int OgrenciNo { get; set; }
+    public string Bolum { get; set; } = "";
+}
+
+class Program
+{
+    static void Main()
+    {
+        Ogrenci ogrenci = new Ogrenci();
+        ogrenci.Ad = "Ayşe";
+        ogrenci.Soyad = "Yılmaz";
+        ogrenci.OgrenciNo = 2025001;
+        ogrenci.Bolum = "Bilgisayar Programcılığı";
+
+        Console.WriteLine($"{ogrenci.Ad} {ogrenci.Soyad}");
+        Console.WriteLine($"Bölüm: {ogrenci.Bolum}");
+    }
+}
+```
+
+`class Ogrenci : Kisi` ifadesi, `Ogrenci` sınıfının `Kisi` sınıfından kalıtım aldığını gösterir. Bu nedenle `Ogrenci` nesnesi hem `Ad` ve `Soyad` özelliklerine hem de kendi `OgrenciNo` ve `Bolum` özelliklerine sahiptir.
+
+Diyagramdaki boş üçgenli ok üst sınıfı gösterir. Okun ucu `Kisi` sınıfına baktığı için `Kisi` üst sınıf, `Ogrenci` alt sınıftır.
+
+## 2. Aynı üst sınıftan türeyen sınıflar
+
+Birden fazla sınıf aynı üst sınıftan kalıtım alabilir. Böylece bu sınıflar ortak özellikleri üst sınıftan alırken kendilerine özgü özellikleri de korur.
+
+### Örnek 2 — Hayvan, kedi ve köpek
+
+**Sınıf diyagramı**
+
 ```mermaid
 classDiagram
-    class Sekil {
-      <<abstract>>
-      +Alan() double
+    class Hayvan {
+        +Ad: string
     }
-    class Ucgen {
-      +taban: double
-      +yukseklik: double
-      +Alan() double
+
+    class Kedi {
+        +Renk: string
     }
-    class Daire {
-      +r: double
-      +Alan() double
+
+    class Kopek {
+        +Cins: string
     }
-    Sekil <|-- Ucgen
-    Sekil <|-- Daire
+
+    Hayvan <|-- Kedi
+    Hayvan <|-- Kopek
 ```
-Burada “Sekil” soyut bir üst sınıf olarak ortak bir sözleşme sağlar. “Ucgen” ve “Daire” bu sözleşmeyi farklı biçimlerde hayata geçirir. İstemci kod, “Sekil” üzerinden konuşur; somut türün ayrıntısına bağımlı değildir.
 
-## 🔻 Arayüz (Interface) ve Realization
-- Arayüzler “ne yapılacağı”nı söyler, “nasıl yapılacağı”nı değil.
-- Birden fazla sınıf aynı arayüzü farklı yaklaşımlarla gerçekleştirebilir; bu da sistemde strateji değişimini kolaylaştırır.
-- Arayüzler, istemci kod ile hizmet sağlayıcılar arasına açık bir sözleşme koyar.
+**C# kodu**
 
-### 📐 Örnek — Yazdırılabilir Varlıklar
+```csharp
+using System;
+
+class Hayvan
+{
+    public string Ad { get; set; } = "";
+}
+
+class Kedi : Hayvan
+{
+    public string Renk { get; set; } = "";
+}
+
+class Kopek : Hayvan
+{
+    public string Cins { get; set; } = "";
+}
+
+class Program
+{
+    static void Main()
+    {
+        Kedi kedi = new Kedi();
+        kedi.Ad = "Mırmır";
+        kedi.Renk = "Tekir";
+
+        Kopek kopek = new Kopek();
+        kopek.Ad = "Karabaş";
+        kopek.Cins = "Sivas Kangalı";
+
+        Console.WriteLine($"{kedi.Ad}: {kedi.Renk}");
+        Console.WriteLine($"{kopek.Ad}: {kopek.Cins}");
+    }
+}
+```
+
+`Kedi` ve `Kopek`, `Hayvan` sınıfından kalıtım alır. Bu nedenle ikisi de `Ad` özelliğine sahiptir. `Renk` yalnızca `Kedi` sınıfında, `Cins` ise yalnızca `Kopek` sınıfında bulunur.
+
+## 3. Birden fazla düzeyden oluşan kalıtım
+
+Bir sınıf, başka bir alt sınıfın devamı olabilir. Bu durumda en üstteki sınıfın özellikleri, aradaki sınıf üzerinden en alttaki sınıfa da aktarılır.
+
+### Örnek 3 — Canlı, hayvan ve kuş
+
+**Sınıf diyagramı**
+
 ```mermaid
 classDiagram
-    class IYazdirilabilir {
-      <<interface>>
-      +Yazdir() void
+    class Canli {
+        +Ad: string
     }
-    class Fatura {
-      +no: string
-      +Yazdir() void
+
+    class Hayvan {
+        +AyakSayisi: int
     }
-    class Rapor {
-      +ad: string
-      +Yazdir() void
+
+    class Kus {
+        +KanatAcikligi: double
     }
-    IYazdirilabilir <|.. Fatura
-    IYazdirilabilir <|.. Rapor
+
+    Canli <|-- Hayvan
+    Hayvan <|-- Kus
 ```
-Aynı arayüz farklı sınıflarca farklı biçimde uygulanabilir. İstemci, “IYazdirilabilir” üzerinden çalışarak somut sınıflara bağımlılığını azaltır.
 
-## 🧭 İlkeler ve İpuçları (Kavramsal)
-- LSP (Liskov Substitution Principle): Alt tür, üst türün beklenen davranışlarını bozmayacak şekilde onun yerine geçebilmelidir. Bu, kalıtımın güvenli kullanılmasının temel ölçütüdür.
-- ISP (Interface Segregation Principle): Arayüzler küçük, odaklı ve amaca uygun olmalıdır. “Şişkin” arayüzler, istemcileri gereksiz metotları uygulamaya zorlar.
-- DIP (Dependency Inversion Principle): Yüksek seviye modüller, düşük seviye detaylara değil, soyutlamalara bağımlı olmalıdır. Bu, bağımlılıkların gevşek bağlanmasını sağlar.
-- Bileşim Tercihi: Kod paylaşımı için kalıtım yerine önce bileşim (has-a) düşünün. Kalıtım, davranışsal uzmanlaşma için uygundur; sadece ortak kodu “kolayca kopyalamamak” adına seçilmemelidir.
+**C# kodu**
 
-## 📝 Alıştırmalar
-1) “Ödeme” (soyut üst sınıf) → “KrediKartı/Havale/Nakit” (alt sınıflar) hiyerarşisini generalization ile çizin; her alt sınıfın neden üst sınıf yerine geçebildiğini LSP açısından tartışın.
-2) “ILoglayici” arayüzünü ve “KonsolLog/DosyaLog” gibi iki farklı gerçekleştirmeyi realization ile gösterin; strateji değiştirme senaryosu yazın (ne zaman hangisini seçersiniz?).
-3) Mevcut bir sisteminizde (okul, kütüphane, e-ticaret vb.) kalıtım mı yoksa bileşim mi daha doğru? Bir örnekle gerekçe yazın.
+```csharp
+using System;
 
-## 📚 Önerilen Okuma
-- Generalization ve Realization: https://www.uml-diagrams.org/generalization.html  
-- Arayüzler ve sözleşmeler: https://www.uml-diagrams.org/class-diagrams-interfaces.html
+class Canli
+{
+    public string Ad { get; set; } = "";
+}
 
----
+class Hayvan : Canli
+{
+    public int AyakSayisi { get; set; }
+}
+
+class Kus : Hayvan
+{
+    public double KanatAcikligi { get; set; }
+}
+
+class Program
+{
+    static void Main()
+    {
+        Kus kus = new Kus();
+        kus.Ad = "Martı";
+        kus.AyakSayisi = 2;
+        kus.KanatAcikligi = 1.2;
+
+        Console.WriteLine($"Ad: {kus.Ad}");
+        Console.WriteLine($"Ayak sayısı: {kus.AyakSayisi}");
+        Console.WriteLine($"Kanat açıklığı: {kus.KanatAcikligi} metre");
+    }
+}
+```
+
+`Kus`, doğrudan `Hayvan` sınıfından; `Hayvan` da `Canli` sınıfından kalıtım alır. Bu yüzden `Kus` nesnesi hem `KanatAcikligi` hem `AyakSayisi` hem de `Ad` özelliklerini kullanabilir.
+
+## 4. Kalıtım kullanırken dikkat edilecekler
+
+- **“Bir türüdür” kontrolü yapın:** `Ogrenci`, bir `Kisi` türüdür; bu nedenle örnekte kalıtım anlamlıdır.
+- **Ortak olanı üst sınıfa koyun:** Alt sınıflarda gerçekten ortak olan özellik ve davranışları üst sınıfta tutun.
+- **Alt sınıfa özgü olanı alt sınıfta bırakın:** Örneğin `KapiSayisi`, her araç için geçerli olmadığından `Araba` sınıfında bulunur.
+- **Sırf kodu tekrar etmemek için kalıtım kullanmayın:** Alt sınıfın üst sınıfla gerçek bir “bir türüdür” ilişkisi yoksa bu ilişkiyi kurmayın.
+- **C# sınıfları yalnızca bir sınıftan kalıtım alabilir:** Örneğin bir sınıf aynı anda hem `Arac` hem `Canli` sınıfından kalıtım alamaz.
+
+## 5. Kısa özet
+
+- Kalıtım, alt sınıfın üst sınıfın ortak özellik ve davranışlarını kullanmasını sağlar.
+- C#'ta kalıtım `class AltSinif : UstSinif` biçiminde yazılır.
+- Birden fazla alt sınıf aynı üst sınıftan kalıtım alabilir.
+- Kalıtım birkaç düzeyde devam edebilir; alt sınıf, üst sınıflardaki özellikleri de kullanır.
+
+## Alıştırmalar
+
+Her alıştırmada önce sınıf diyagramını çizin, ardından diyagrama uygun C# kodunu yazın.
+
+1. `Urun` üst sınıfı ile `Kitap` alt sınıfını oluşturun. Üründe ad ve fiyat, kitapta yazar ve ISBN bilgisi bulunsun.
+2. `Calisan` üst sınıfı ile `Ogretmen` ve `Muhendis` alt sınıflarını oluşturun. Ortak özellikleri `Calisan` sınıfına, mesleğe özgü birer özelliği alt sınıflara ekleyin.
+3. `Canli`, `Hayvan` ve `Kopek` sınıflarından oluşan çok düzeyli bir kalıtım yapısı kurun. Her sınıfa kendine özgü bir özellik ekleyin ve `Kopek` nesnesinde üçünü de kullanın.
